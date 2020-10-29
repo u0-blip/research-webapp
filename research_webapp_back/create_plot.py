@@ -218,3 +218,20 @@ def struct_editor(request):
     plot_string = mpld3.fig_to_html(fig, d3_url=None, mpld3_url=None, no_extras=False, template_type='general', figid=None, use_http=False)
 
     return HttpResponse(plot_string, status=200)
+
+
+def matrix_editor(request):
+    fig = plt.figure(figsize=(5,5))
+    ax = plt.gca()
+
+    np.random.seed(0)
+    points = ax.plot(np.random.normal(size=20),
+                    np.random.normal(size=20), 'or', alpha=0.5,
+                    markersize=50, markeredgewidth=1)
+    ax.set_title("Matrix visualizer", fontsize=18)
+
+    # plugins.connect(fig, DragPlugin(points[0]))
+
+    plot_string = mpld3.fig_to_html(fig, d3_url=None, mpld3_url=None, no_extras=False, template_type='general', figid=None, use_http=False)
+
+    return HttpResponse(plot_string, status=200)

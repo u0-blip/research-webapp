@@ -18,7 +18,7 @@ from django.urls import path
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
 from music.views import music_file, show_image, longtask, download_mean, download_field
-from research_webapp_back.create_plot import plot, struct_editor, patchPath
+from research_webapp_back.create_plot import plot, struct_editor, patchPath, matrix_editor
 from music.celery_task import taskstatus
 
 
@@ -34,5 +34,6 @@ urlpatterns = [
     path('status/<task_id>', csrf_exempt(taskstatus)),
     path('plot/', csrf_exempt(plot)),
     path('patchPath/', csrf_exempt(patchPath)),
+    path('matrix_editor/', csrf_exempt(matrix_editor)),
     path('editor/', csrf_exempt(struct_editor)),
 ]
