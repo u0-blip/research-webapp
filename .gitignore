@@ -1,3 +1,4 @@
 migrations/
-database/
+database/*
 *.sqlite3
+.pyc

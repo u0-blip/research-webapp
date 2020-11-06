@@ -12,11 +12,14 @@ import uuid
 import urllib.parse
 import json
 import redis
-from music.celery_task import long_task
+from music.celery_task import meepsim
 from django.http import JsonResponse
 from django.urls import reverse
+import io
 
-# Imaginary function to handle an uploaded file.
+current_user =0
+r = redis.Redis(host = 'localhost', port = 6379, db=0)
+
 
 def handle_uploaded_file(f, name):
     with open('./database/'+name, 'wb+') as destination:
@@ -53,8 +56,18 @@ def music_file(request, id=None):
         status = handle_delete_file(id)
         return HttpResponse(status=status)
 
-current_user =0
-import io
+
+def transient_plot(request):
+    if request.method == 'GET':
+        file_path = r.get('animate_file').decode('utf-8')
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type="video/mp4")
+                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+                return response
+        raise Http404
+
+
 def show_image(request, type_img):
     img = r.get(str(current_user) + type_img)
     print('in show image', str(current_user) + type_img)
@@ -64,11 +77,11 @@ def show_image(request, type_img):
     else:
         return HttpResponse(img, status=200)
 
-r = redis.Redis(host = 'localhost', port = 6379, db=0)
 
 def longtask(request):
-    task = long_task.apply_async(kwargs={'current_user':current_user})
-    return JsonResponse({}), 202, {'Location': reverse('taskstatus:task_id', task_id=task.id)}
+    r.set('user_' + str(current_user)+'_current_config', request.body)
+    task = meepsim.apply_async(kwargs={'current_user':current_user})
+    return HttpResponse(json.dumps({'Location': str(task.id)}), status=202)
 
 def download_mean(request):
     bytes_obj = io.BytesIO(r.get(str(current_user) + 'mean_result'))

@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import mpld3
-from mpld3 import plugins
 from django.http import HttpResponse, Http404
 
 import matplotlib.path as mpath
@@ -14,6 +12,9 @@ import matplotlib as mpl
 
 import mpld3
 from mpld3 import plugins, utils
+import redis
+
+r = redis.Redis(host = 'localhost', port = 6379, db=0)
 
 class DragPlugin(plugins.PluginBase):
     JAVASCRIPT = r"""
@@ -140,6 +141,72 @@ class LinkedDragPlugin(plugins.PluginBase):
                       "idline": utils.get_id(line),
                       "idpatch": utils.get_id(patch)}
 
+class SliderView(mpld3.plugins.PluginBase):
+    """ Add slider and JavaScript / Python interaction. """
+
+    JAVASCRIPT = """
+    mpld3.register_plugin("sliderview", SliderViewPlugin);
+    SliderViewPlugin.prototype = Object.create(mpld3.Plugin.prototype);
+    SliderViewPlugin.prototype.constructor = SliderViewPlugin;
+    SliderViewPlugin.prototype.requiredProps = ["idline", "callback_func"];
+    SliderViewPlugin.prototype.defaultProps = {}
+
+    function SliderViewPlugin(fig, props){
+        mpld3.Plugin.call(this, fig, props);
+    };
+
+    SliderViewPlugin.prototype.draw = function(){
+      var line = mpld3.get_element(this.props.idline);
+      var callback_func = this.props.callback_func;
+
+      var div = d3.select("#" + this.fig.figid);
+
+      // Create slider
+      div.append("input").attr("type", "range").attr("min", 0).attr("max", 10).attr("step", 0.1).attr("value", 1)
+          .on("change", function() {
+              var command = callback_func + "(" + this.value + ")";
+              console.log("running "+command);
+              var callbacks = { 'iopub' : {'output' : handle_output}};
+              var kernel = IPython.notebook.kernel;
+              kernel.execute(command, callbacks, {silent:false});
+          });
+
+      function handle_output(out){
+        //console.log(out);
+        var res = null;
+        // if output is a print statement
+        if (out.msg_type == "stream"){
+          res = out.content.data;
+        }
+        // if output is a python object
+        else if(out.msg_type === "pyout"){
+          res = out.content.data["text/plain"];
+        }
+        // if output is a python error
+        else if(out.msg_type == "pyerr"){
+          res = out.content.ename + ": " + out.content.evalue;
+          alert(res);
+        }
+        // if output is something we haven't thought of
+        else{
+          res = "[out type not implemented]";  
+        }
+
+        // Update line data
+        line.data = JSON.parse(res);
+        line.elements()
+          .attr("d", line.datafunc(line.data))
+          .style("stroke", "black");
+
+       }
+
+    };
+    """
+
+    def __init__(self, line, callback_func):
+        self.dict_ = {"type": "sliderview",
+                      "idline": mpld3.utils.get_id(line),
+                      "callback_func": callback_func}
 
 def patchPath(request):
     fig, ax = plt.subplots()
@@ -178,31 +245,37 @@ def patchPath(request):
 
 
 
-def plot(request):
+def plot(request, title):
     fig = plt.figure(figsize=(4,4))
     ax = plt.gca()
-    x = np.linspace(-2, 2, 20)
-    y = x[:, None]
-    X = np.zeros((20, 20, 4))
+    if title == None:
+        x = np.linspace(-2, 2, 20)
+        y = x[:, None]
+        X = np.zeros((20, 20, 4))
 
-    X[:, :, 0] = np.exp(- (x - 1) ** 2 - (y) ** 2)
-    X[:, :, 1] = np.exp(- (x + 0.71) ** 2 - (y - 0.71) ** 2)
-    X[:, :, 2] = np.exp(- (x + 0.71) ** 2 - (y + 0.71) ** 2)
-    X[:, :, 3] = np.exp(-0.25 * (x ** 2 + y ** 2))
+        X[:, :, 0] = np.exp(- (x - 1) ** 2 - (y) ** 2)
+        X[:, :, 1] = np.exp(- (x + 0.71) ** 2 - (y - 0.71) ** 2)
+        X[:, :, 2] = np.exp(- (x + 0.71) ** 2 - (y + 0.71) ** 2)
+        X[:, :, 3] = np.exp(-0.25 * (x ** 2 + y ** 2))
 
-    im = ax.imshow(X, extent=(10, 20, 10, 20),
-                origin='lower', zorder=1, interpolation='nearest')
-    fig.colorbar(im, ax=ax)
+        im = ax.imshow(X, extent=(10, 20, 10, 20),
+                    origin='lower', zorder=1, interpolation='nearest')
+        fig.colorbar(im, ax=ax)
 
-    ax.set_title('An Image', size=20)
+        ax.set_title('An Image', size=20)
 
-    plugins.connect(fig, plugins.MousePosition(fontsize=14))
+        plugins.connect(fig, plugins.MousePosition(fontsize=14))
 
-    plot_string = mpld3.fig_to_html(fig, d3_url=None, mpld3_url=None, no_extras=False, template_type='general', figid=None, use_http=False)
+        plot_string = mpld3.fig_to_html(fig, d3_url=None, mpld3_url=None, no_extras=False, template_type='general', figid=None, use_http=False)
 
-    return HttpResponse(plot_string, status=200)
+        return HttpResponse(plot_string, status=200)
+    else:
+        plot_string = r.get('user_' + str(0) + '_plot_' + title)
+
+        return HttpResponse(plot_string, status=200)
 
 
+        
 def struct_editor(request):
     fig = plt.figure(figsize=(5,5))
     ax = plt.gca()

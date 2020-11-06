@@ -140,3 +140,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_ROOT= './database/'
+
+
+# Celery configs
+CELERY_BROKER_URL = 'redis://localhost:6379/2'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'
+# CELERY_TASK_ACKs_LATE = True
+# CELERY_WORKER_PREFATCH_MULTIPLIER = 1

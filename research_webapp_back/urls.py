@@ -17,9 +17,13 @@ from django.contrib import admin
 from django.urls import path
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
-from music.views import music_file, show_image, longtask, download_mean, download_field
+from music.views import music_file, show_image, longtask, download_mean, download_field, longtask, transient_plot
 from research_webapp_back.create_plot import plot, struct_editor, patchPath, matrix_editor
 from music.celery_task import taskstatus
+
+# How to start workers
+# celery -A celery_task.celery worker --loglevel=info
+# gunicorn --bind 127.0.0.1:8003 app:app
 
 
 urlpatterns = [
@@ -27,12 +31,13 @@ urlpatterns = [
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path('music/', csrf_exempt(music_file)),
     path('music/<str:id>', csrf_exempt(music_file)),
+    path('transient_plot/', csrf_exempt(transient_plot)),
     path('sim_image_data/<type_img>', csrf_exempt(show_image)),
-    path('longtask', csrf_exempt(longtask)),
+    path('longtask/', csrf_exempt(longtask)),
     path('download_mean', csrf_exempt(download_mean)),
     path('download_field', csrf_exempt(download_field)),
     path('status/<task_id>', csrf_exempt(taskstatus)),
-    path('plot/', csrf_exempt(plot)),
+    path('plot/<title>', csrf_exempt(plot)),
     path('patchPath/', csrf_exempt(patchPath)),
     path('matrix_editor/', csrf_exempt(matrix_editor)),
     path('editor/', csrf_exempt(struct_editor)),
