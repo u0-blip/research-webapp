@@ -70,7 +70,6 @@ def transient_plot(request):
 
 def show_image(request, type_img):
     img = r.get(str(current_user) + type_img)
-    print('in show image', str(current_user) + type_img)
     if img == None:
         return Http404('image not found')
 

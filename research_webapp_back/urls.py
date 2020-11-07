@@ -22,7 +22,7 @@ from research_webapp_back.create_plot import plot, struct_editor, patchPath, mat
 from music.celery_task import taskstatus
 
 # How to start workers
-# celery -A celery_task.celery worker --loglevel=info
+# celery -A music.celery_task.celery worker --loglevel=info
 # gunicorn --bind 127.0.0.1:8003 app:app
 
 

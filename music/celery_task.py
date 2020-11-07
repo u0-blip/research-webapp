@@ -37,23 +37,29 @@ celery.config_from_object('django.conf:settings', namespace='CELERY')
 def update_configs(web_config):
     config = deepcopy(primitive_config)
     sections_name = ['Visualization', 'General', 'Geometry', 'Simulation', 'Source']
-    for i, section in enumerate(web_config):
+    for i, keysection in enumerate(web_config.items()):
         sec_name = sections_name[i]
+        key, section = keysection
+        for type_field, fields  in section.items():
+            if type_field == 'radio':
+                for field_name, v in fields.items():
+                    get = config.get(sec_name, field_name)
+                    config.set(sec_name, field_name, str(v[0]))
+
+    for i, keysection in enumerate(web_config.items()):
+        sec_name = sections_name[i]
+        key, section = keysection
         for type_field, fields  in section.items():
             if type_field in ['check', 'input'] :
                 for field_name, v in fields.items():
                     get = config.get(sec_name, field_name)
                     config.set(sec_name, field_name, str(v))
-            elif type_field == 'radio':
-                for field_name, v in fields.items():
-                    get = config.get(sec_name, field_name)
-                    config.set(sec_name, field_name, str(v[0]))
             elif type_field in ['material_assign']:
                 for field_name, v in fields.items():
-                    sim_types = config.get('Simulation', 'sim_types')
                     get = config.get(sec_name, field_name)
+                    sim_types = config.get('Simulation', 'sim_types')
                     config.set(sec_name, field_name, ', '.join([str(ele) for ele in v[sim_types]]))
-            else: #if type_field in ['range', 'coord', 'material']:
+            elif type_field not in ['radio']: #if type_field in ['range', 'coord', 'material']:
                 for field_name, v in fields.items():
                     get = config.get(sec_name, field_name)
                     config.set(sec_name, field_name, ', '.join([str(ele) for ele in v]))
