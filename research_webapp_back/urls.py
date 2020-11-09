@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.shortcuts import render
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
 from music.views import music_file, show_image, longtask, download_mean, download_field, longtask, transient_plot
@@ -25,8 +26,11 @@ from music.celery_task import taskstatus
 # celery -A music.celery_task.celery worker --loglevel=info
 # gunicorn --bind 127.0.0.1:8003 app:app
 
+def index(request):
+    return render(request, "index.html")
 
 urlpatterns = [
+    path('', index, name="index"),
     path('admin/', admin.site.urls),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path('music/', csrf_exempt(music_file)),
