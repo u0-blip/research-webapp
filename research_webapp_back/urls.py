@@ -24,7 +24,7 @@ from music.celery_task import taskstatus
 
 # How to start workers
 # celery -A music.celery_task.celery worker --loglevel=info
-# gunicorn --bind 127.0.0.1:8003 app:app
+# gunicorn --bind 0.0.0.0:8000 research_webapp_back.wsgi
 
 def index(request):
     return render(request, "index.html")
