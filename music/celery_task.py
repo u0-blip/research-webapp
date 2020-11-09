@@ -39,10 +39,10 @@ def update_configs(web_config):
     sections_name = ['Visualization', 'General', 'Geometry', 'Simulation', 'Source']
     web_config_dict = {}
     if type(web_config) is list:
-        for i, config in enumerate(web_config):
-            web_config_dict[i] = config
+        for i, conf in enumerate(web_config):
+            web_config_dict[i] = conf
     web_config = web_config_dict
-    
+
     for i, keysection in enumerate(web_config.items()):
         sec_name = sections_name[i]
         key, section = keysection
