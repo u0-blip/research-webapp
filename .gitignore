@@ -1,4 +1,4 @@
 migrations/
 database/*
 *.sqlite3
-.pyc
+*.pyc
