@@ -29,7 +29,6 @@ from music.celery_task import taskstatus
 def index(request):
     return render(request, "index.html")
 
-print('what the fuck is happening?')
 
 urlpatterns = [
     path('', index, name="index"),
