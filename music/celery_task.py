@@ -15,7 +15,7 @@ import json
 import redis
 from copy import deepcopy
 
-r = redis.Redis(host = 'localhost', port = 6379, db=0)
+r = redis.Redis(host = 'meep_celery', port = 6379, db=0)
 from my_meep.wsl_main import wsl_main
 from my_meep.config.configs import primitive_config
 # pip install --user -e .

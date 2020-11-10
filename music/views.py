@@ -18,7 +18,7 @@ from django.urls import reverse
 import io
 
 current_user =0
-r = redis.Redis(host = 'localhost', port = 6379, db=0)
+r = redis.Redis(host = 'meep_celery', port = 6379, db=0)
 
 
 def handle_uploaded_file(f, name):

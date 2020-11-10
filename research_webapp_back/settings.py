@@ -146,7 +146,7 @@ STATICFILES_DIRS = (
 
 
 # Celery configs
-CELERY_BROKER_URL = 'redis://localhost:6379/2'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'
+CELERY_BROKER_URL = 'redis://meep_celery:6379/2'
+CELERY_RESULT_BACKEND = 'redis://meep_celery:6379/2'
 # CELERY_TASK_ACKs_LATE = True
 # CELERY_WORKER_PREFATCH_MULTIPLIER = 1
