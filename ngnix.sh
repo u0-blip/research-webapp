@@ -13,6 +13,6 @@ cp /home/research-webapp-back/nginx/staging.conf /etc/nginx/sites-available/my-p
 
 ln -s /etc/nginx/sites-available/my-project-host.conf /etc/nginx/sites-enabled/my-project-host.conf
 
-sudo service nginx start
-sudo service nginx reload
+service nginx start
+service nginx reload
 # sudo nginx -s start
