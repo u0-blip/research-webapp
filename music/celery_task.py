@@ -75,7 +75,7 @@ def update_configs(web_config):
 def meepsim(self, current_user):
     config = r.get('user_' + str(current_user)+'_current_config')
     config = json.loads(config)
-    print('current user', current_user, config._sections)
+    print('current user', current_user, config)
     message = ''
     prev = time()
     for i, total, res in wsl_main(update_configs(config), current_user):
