@@ -41,7 +41,7 @@ def update_configs(web_config):
     if type(web_config) is list:
         for i, conf in enumerate(web_config):
             web_config_dict[i] = conf
-    web_config = web_config_dict
+        web_config = web_config_dict
 
     for i, keysection in enumerate(web_config.items()):
         sec_name = sections_name[i]
@@ -75,7 +75,6 @@ def update_configs(web_config):
 def meepsim(self, current_user):
     config = r.get('user_' + str(current_user)+'_current_config')
     config = json.loads(config)
-    print('current user', current_user, config)
     message = ''
     prev = time()
     for i, total, res in wsl_main(update_configs(config), current_user):
