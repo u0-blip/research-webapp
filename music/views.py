@@ -79,6 +79,7 @@ def show_image(request, type_img):
 
 def longtask(request):
     r.set('user_' + str(current_user)+'_current_config', request.body)
+    print('current user before', current_user, request.body)
     task = meepsim.apply_async(kwargs={'current_user':current_user})
     return HttpResponse(json.dumps({'Location': str(task.id)}), status=202)
 
