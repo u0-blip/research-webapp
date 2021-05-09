@@ -16,8 +16,8 @@ import redis
 from copy import deepcopy
 
 r = redis.Redis(host = 'meep_celery', port = 6379, db=0)
-from my_meep.wsl_main import wsl_main
-from my_meep.config.configs import primitive_config
+# from my_meep.wsl_main import wsl_main
+# from my_meep.config.configs import primitive_config
 # pip install --user -e .
 
 
@@ -70,6 +70,12 @@ def update_configs(web_config):
                     get = config.get(sec_name, field_name)
                     config.set(sec_name, field_name, ', '.join([str(ele) for ele in v]))
     return config
+
+
+def wsl_main(config, user):
+    for i in range(10):
+        yield i, 10, 'success'
+
 
 @celery.task(bind=True)
 def meepsim(self, current_user):
