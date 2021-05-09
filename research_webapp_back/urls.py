@@ -21,13 +21,15 @@ from django.views.decorators.csrf import csrf_exempt
 from music.views import music_file, show_image, longtask, download_mean, download_field, longtask, transient_plot
 from research_webapp_back.create_plot import plot, struct_editor, patchPath, matrix_editor
 from music.celery_task import taskstatus
+from django.http import HttpResponse
 
 # How to start workers
 # celery -A music.celery_task.celery worker --loglevel=info
 # gunicorn --bind 0.0.0.0:8000 research_webapp_back.wsgi
 
+
 def index(request):
-    return render(request, "index.html")
+    return HttpResponse('lol, what\'s up')
 
 
 urlpatterns = [
